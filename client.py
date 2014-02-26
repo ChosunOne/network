@@ -6,5 +6,13 @@ port = int(input('Please enter the port to connect on\n'))
 
 print('Connecting to', host, 'on port', port)
 s.connect((host, port))
-print(s.recv(1024))
-s.close
+
+while True:
+
+    received = s.recv(1024)
+    
+    if received != b'':
+        print(received)
+
+    s.close
+
