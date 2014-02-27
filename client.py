@@ -11,8 +11,8 @@ while True:
 
     received = s.recv(1024)
     
+    
     if received != b'':
-        print(received)
+        print(received.decode('utf-8'))
 
     s.close
-
