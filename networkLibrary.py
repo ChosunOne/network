@@ -10,28 +10,35 @@ class client:
         self.port = port
         self.socket = socket
 
-class clientThread(threading.Thread):
-    def __init__(self, ip, port, socket):
-        threading.Thread.__init__(self)
-        self.ip = ip
+class server:
+    def __init__(self, port):
+        self.socket = socket.socket()
+        self.hostName = socket.gethostname()
         self.port = port
-        self.clientsock = socket
+        self.q = Queue()
+        self.queue = []
+        self.queue.append(self.q)
+        self.maxUsers = 10
 
-    def __run__(self):
-        print('Connection from :', self.ip, ':', str(self.port))
+    def start(self):
+        self.socket.bind((self.hostName, self.port))
+        
+        print(self.hostName, 'set up on port', str(self.port))
+        
+        self.socket.listen(5)
 
-        self.clientsock.send('Welcome to the server!\n'.encode())
+        print('Waiting for connections...')
 
-        data = 'data'
+        while True:
+            (c, (ip, port)) = self.socket.accept()
+            if c:
+                user = client(ip, port, c)
+                self.queue[0].put(user)
+                t = threading.Thread(target=clientWorker, args=self.queue)
+                t.daemon = True
+                t.start()
 
-        while len(data):
-            try:
-                data = self.clientsock.recv(2048)
-                print('Client sent:', data)
-                self.clientsock.send(('You sent me:' + data).encode())
-            except:
-                print('Client disconnected')
-                break
+        self.queue[0].join()
 
 def handleClient(ip, port, socket):
     
