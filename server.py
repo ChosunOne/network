@@ -1,5 +1,6 @@
 import socket
 import threading
+from queue import Queue
 from networkLibrary import *
 
 print('Setting up server')
@@ -7,7 +8,11 @@ print('Setting up server')
 s = socket.socket()
 host = socket.gethostname()
 port = 12345
-threads = []
+q = Queue()
+que = []
+que.append(q)
+
+MAXUSERS = 4
 
 s.bind((host, port))
 
@@ -19,10 +24,17 @@ print('Waiting for connections')
 
 while True:
     (c, (ip, port)) = s.accept()
-    newthread = clientThread(ip, port, c)
-    newthread.__run__()
-    threads.append(newthread)
+    if c:
+        
+        user = client(ip, port, c)
+        que[0].put(user)
+        
+        t = threading.Thread(target=clientWorker, args=que)
+        t.daemon = True
+        t.start()
 
-for t in threads:
-    t.join()
+q.join()
+
+    
+
     

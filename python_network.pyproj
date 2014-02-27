@@ -18,6 +18,7 @@
     <Compile Include="client.py" />
     <Compile Include="server.py" />
     <Compile Include="networkLibrary.py" />
+    <Compile Include="threadTest.py" />
     <Compile Include="__init__.py" />
   </ItemGroup>
   <ItemGroup />
